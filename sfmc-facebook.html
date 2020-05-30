@@ -39,7 +39,7 @@ if (requestMethod == 'GET') { // Subscription
                     req.emptyContentHandling = 0;
                     req.retries = 2;
                     req.continueOnError = true;
-                    req.contentType = contentType;
+                    req.contentType = 'application/json';
                     req.setHeader("Authorization", auth);
                     req.method = "GET";
                     var resp = req.send();
