@@ -1,0 +1,116 @@
+<script runat="server">
+Platform.Load("core", "1.1.1");
+
+var VERIFY_TOKEN = 'You cannot know this';
+
+var requestMethod = Platform.Request.Method(); // Returns GET or POST
+
+if (requestMethod == 'GET') { // Subscription
+    var verifyToken = Platform.Request.GetQueryStringParameter("hub.verify_token");
+    var challenge = Platform.Request.GetQueryStringParameter("hub.challenge");
+
+    if (verifyToken !== VERIFY_TOKEN) {
+        Write(Stringify({ success: false, reason: 'Verify token does not match' }));
+    } else {
+        // We echo the received challenge back to Facebook to finish the verification process.
+        Write(challenge);
+    }
+} else if (requestMethod == 'POST') { // Handling payload
+
+    var accessToken = 'Long-live Access Token';
+
+    // Receive and process 
+    try {
+        var postdata = Platform.Request.GetPostData();
+        var parsed = Platform.Function.ParseJSON(String(postdata));
+
+        if (parsed && parsed.entry && parsed.entry.length > 0) {
+
+            for (var i = 0; i < parsed.entry.length; i++) {
+
+                var changes = parsed.entry[i].changes;
+
+                for (var x = 0; x < changes.length; x++) {
+
+                    var newLeadId = changes[x].value.leadgen_id;
+                    var url = 'https://graph.facebook.com/v7.0/' + newLeadId + '/';
+                    var auth = 'Bearer ' + accessToken;
+                    var req = new Script.Util.HttpRequest(url);
+                    req.emptyContentHandling = 0;
+                    req.retries = 2;
+                    req.continueOnError = true;
+                    req.contentType = contentType;
+                    req.setHeader("Authorization", auth);
+                    req.method = "GET";
+                    var resp = req.send();
+                    var resultJSONString = Platform.Function.ParseJSON(String(resp.content));
+
+                    var Language, Job_Title, Job_URL, Job_URL_Quick_Apply, Campaign_Owner_Email, Taal, First_Name, Last_Name, Email, Phone_Number, DateSubmitted;
+
+                    DateSubmitted = resultJSONString.created_time;
+
+                    var questionArray = [];
+
+                    for (var y = 0; y < resultJSONString.field_data.length; y++) {
+                        var fieldData = resultJSONString.field_data[y];
+
+                        //explicitly check based on field name or Tracking Parameter
+                        if (fieldData.name == 'Language') {
+                            Language = fieldData.values[0];
+                        } else if (fieldData.name == 'Job_Title') {
+                            Job_Title = fieldData.values[0];
+                        } else if (fieldData.name == 'Job_URL') {
+                            Job_URL = fieldData.values[0];
+                        } else if (fieldData.name == 'Job_URL_Quick_Apply') {
+                            Job_URL_Quick_Apply = fieldData.values[0];
+                        } else if (fieldData.name == 'Campaign_Owner_Email') {
+                            Campaign_Owner_Email = fieldData.values[0];
+                        } else if (fieldData.name == 'taal') {
+                            Taal = fieldData.values[0];
+                        } else if (fieldData.name == 'first_name') {
+                            First_Name = fieldData.values[0];
+                        } else if (fieldData.name == 'surname') {
+                            Last_Name = fieldData.values[0];
+                        } else if (fieldData.name == 'email') {
+                            Email = fieldData.values[0];
+                        } else if (fieldData.name == 'phone_number') {
+                            Phone_Number = fieldData.values[0];
+                        } else { //implicitly saving Question/Answer in an array.
+                            if(questionArray.length < 10) {
+                                var questionAnswer = { question: fieldData.name, answer: fieldData.values[0] };
+                                questionArray.push(questionAnswer);
+                            }
+                        }
+                    }
+
+                    //TODO: handle the payload however it works the best for you.
+                    // Write(resp.headers["returnHeader"]);
+                    // var rows = Platform.Function.InsertData("FB_Leads", ["FB_LeadID", "Email", "Full_Name", "DateSubmitted", "JSON", "Language"], [newLeadId, Email, Full_Name, DateSubmitted, String(postdata), Language]);
+
+                    // if (rows != 0) {
+                    //     Write('200: Success');
+                    // } else {
+                    //     var d = 'No rows updated';
+                    //     var o = data + ' ' + resultJSONString;
+                    //     logError(d, o);
+                    // }
+                }
+            }
+        }
+
+    } catch (e) {
+        var d = 'Failed to make the call';
+        var o = '{}';
+        logError(d, o);
+    }
+}
+
+function logError(shortDescription, output) {
+    Write("500: Server Error");
+    try {
+        var rows = Platform.Function.InsertData("FB_Leads_Errors", ["ShortDescription", "Output"], [shortDescription, output]);
+    } catch (e) {
+        Write(Platform.Function.Stringify(e));
+    }
+}
+</script>
