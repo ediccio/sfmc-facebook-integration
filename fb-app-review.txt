@@ -2,30 +2,30 @@ Your submission details
 
 Is a Facebook reviewer able to access or login to your app to verify you're using permissions or features according to Facebook Platform Policy?
 
-No
+  No
 
 Why isn't a Facebook reviewer able to access or install your app? Select the option(s) that best describe the functionality of your integration.
 
-App transfers leads from company's ad account to a database or CRM.
+  App transfers leads from company's ad account to a database or CRM.
 
 leads_retrieval
 
 Tell us how you're using this permission or feature
 
-we use webhooks to retrieve leads from Facebook to our Salesforce Marketing Cloud account
+  we use webhooks to retrieve leads from Facebook to our Salesforce Marketing Cloud account
 
 manage_pages_ad
 
 Tell us how you're using this permission or feature
 
-we use webhooks to retrieve leads from Facebook to our Salesforce Marketing Cloud account
+  we use webhooks to retrieve leads from Facebook to our Salesforce Marketing Cloud account
 
 ads_management
 
 Tell us how you're using this permission or feature
 
-We need to retrieve Leads through Webhook into Salesforce Marketing Cloud. As it's indicated here: https://developers.facebook.com/docs/marketing-api/guides/lead-ads/retrieving.
+  We need to retrieve Leads through Webhook into Salesforce Marketing Cloud. As it's indicated here: https://developers.facebook.com/docs/marketing-api/guides/lead-ads/retrieving.
 
-Sales Reps from the related branch and language (branch/language info is stored in Tracking Parameter of the form) will get notification about the new lead so that they can start work on-time.
+  Sales Reps from the related branch and language (branch/language info is stored in Tracking Parameter of the form) will get notification about the new lead so that they can start work on-time.
 
 Further Tip: You can also upload screencast displaying your integration in short.
